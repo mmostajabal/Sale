@@ -18,8 +18,6 @@ namespace Shared.DTO.OrderItems
         public QuantityRecordDTO Quantity { get; set; }
         public PriceRecordDTO Price { get; set; }
 
-        public OrderDTO order { get; set; }
-
         public ProductDTO products { get; set; }
     }
 }

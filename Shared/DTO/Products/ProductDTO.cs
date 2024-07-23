@@ -14,6 +14,5 @@ namespace Shared.DTO.Products
         public string ProductName { get; set; } = string.Empty;
         public PriceRecordDTO Price { get; set; }
 
-        public ICollection<OrderItemDTO> orderItems { get; set; }
     }
 }

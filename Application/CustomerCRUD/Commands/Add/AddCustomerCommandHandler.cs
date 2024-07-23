@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace Application.CustomerCRUD.Commands.Add
 {
-    public class AddOrderCommandHandler : IRequestHandler<AddCustomerCommand, int>
+    public class AddCustomerCommandHandler : IRequestHandler<AddCustomerCommand, int>
     {
         private readonly IUnitOfWork _unitOfWork;
         
-        public AddOrderCommandHandler(IUnitOfWork unitOfWork)
+        public AddCustomerCommandHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

@@ -4,6 +4,7 @@ using Persistence.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,7 @@ namespace Persistence.Services.Repositories
         }
         public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default) => await _dbSet.ToListAsync();
         public async Task<T> GetAsync(int id, CancellationToken cancellationToken = default) => await _dbSet.FindAsync(id);
+
         public async Task AddAsync(T entity, CancellationToken cancellationToken = default) => await _dbSet.AddAsync(entity);
         public void Update(T entity, CancellationToken cancellationToken = default) => _dbSet.Update(entity);
         public async Task DeleteAsync(int id, CancellationToken cancellationToken = default) {
@@ -28,20 +30,33 @@ namespace Persistence.Services.Repositories
             {
                 _dbSet.Remove(entity);
             }
-            /*if (id == null) return;
-
-            await _dbSet.Where(c=> (int)typeof(T).GetProperty("Id").GetValue(c) == id).ExecuteDeleteAsync();*/
         }
 
-        public async Task DeleteRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default)
+
+        public async Task<int> BulkDelete(Expression<Func<T, bool>> query, CancellationToken cancellationToken = default)
         {
-            if (ids == null || !ids.Any())
+            return await _dbSet.Where(query).ExecuteDeleteAsync();
+        }
+
+        public async Task<IEnumerable<T>> GetByCondition(Expression<Func<T, bool>> query)
+        {
+            return await  _dbSet.Where(query).ToListAsync<T>();
+        }
+
+        public async Task<T> GetAsyncWitIncludeAndOrder(Expression<Func<T, bool>> condition, Expression<Func<T, object>>[] includes, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, CancellationToken cancellationToken = default)
+        {
+            IQueryable<T> query = _dbSet;
+
+            foreach (var include in includes)
             {
-                return;
+                query = query.Include(include);
             }
-            
-            await _dbSet.Where(e => ids.Contains((int)typeof(T).GetProperty("Id").GetValue(e)))
-                        .ExecuteDeleteAsync();
+
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+            return await query.FirstOrDefaultAsync<T>(condition, cancellationToken);
         }
     }
 }
